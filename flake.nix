@@ -8,16 +8,17 @@
   outputs = { nixpkgs, utils, poetry2nix-src, self }: utils.lib.eachDefaultSystem (system:
     let
 
-      pkgs = import nixpkgs { 
-        inherit system; overlays = [ 
-          poetry2nix-src.overlay 
-        ]; 
+      pkgs = import nixpkgs {
+        inherit system; overlays = [
+        poetry2nix-src.overlay
+      ];
+
       };
-      pkgs.python = pkgs.python36;
 
     in
     {
       defaultPackage = pkgs.poetry2nix.mkPoetryApplication {
+        python = pkgs.python39;
         projectDir = ./.;
       };
     });
