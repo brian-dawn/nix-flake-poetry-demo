@@ -1,11 +1,24 @@
 {
-  description = "A very basic flake";
+  description = "Your flake using poetry2nix";
 
-  outputs = { self, nixpkgs }: {
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
+  inputs.utils.url = "github:numtide/flake-utils";
+  inputs.poetry2nix-src.url = "github:nix-community/poetry2nix";
 
-    packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
+  outputs = { nixpkgs, utils, poetry2nix-src, self }: utils.lib.eachDefaultSystem (system:
+    let
 
-    defaultPackage.x86_64-linux = self.packages.x86_64-linux.hello;
+      pkgs = import nixpkgs { 
+        inherit system; overlays = [ 
+          poetry2nix-src.overlay 
+        ]; 
+      };
+      pkgs.python = pkgs.python36;
 
-  };
+    in
+    {
+      defaultPackage = pkgs.poetry2nix.mkPoetryApplication {
+        projectDir = ./.;
+      };
+    });
 }
